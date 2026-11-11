@@ -3832,6 +3832,7 @@ dependencies = [
  "cyper",
  "encoding_rs",
  "flate2",
+ "foreign-types",
  "futures",
  "futures-util",
  "hickory-resolver",

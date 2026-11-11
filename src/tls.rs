@@ -256,6 +256,13 @@ pub struct TlsOptions {
     /// [`trust_anchors` extension]: https://datatracker.ietf.org/doc/html/draft-ietf-tls-trust-anchor-ids-04#section-4.1
     pub trust_anchors: Option<Cow<'static, [u8]>>,
 
+    /// Requests this many bytes of server padding with BoringSSL's experimental
+    /// `server_padding` ClientHello extension (codepoint 4832, `0x12e0`), as Chrome 156 sends it
+    /// with `0`. `None` omits the extension. TLS 1.3 only.
+    ///
+    /// **Default:** `None`
+    pub server_padding_request: Option<u16>,
+
     /// Enables TLS renegotiation by sending the `renegotiation_info` extension.
     ///
     /// **Default:** `true`
@@ -401,6 +408,16 @@ impl TlsOptionsBuilder {
         T: Into<Option<bool>>,
     {
         self.config.grease_sigalgs_enabled = enabled.into();
+        self
+    }
+
+    /// Sets the `server_padding` extension's requested padding; `None` omits it.
+    #[inline]
+    pub fn server_padding_request<T>(mut self, bytes: T) -> Self
+    where
+        T: Into<Option<u16>>,
+    {
+        self.config.server_padding_request = bytes.into();
         self
     }
 
@@ -607,6 +624,7 @@ impl Default for TlsOptions {
             record_size_limit: None,
             key_shares: None,
             trust_anchors: None,
+            server_padding_request: None,
             psk_dhe_ke: true,
             pre_shared_key: false,
             psk_skip_session_ticket: false,
